@@ -44,9 +44,13 @@ def empty_matrix(lines):
 # @profile
 def populate_matrix(matrix, lines):
     '''Populates matrix elements with pairwise Hamming distances'''
+    # Hamming distance is symmetrical, so we only need the upper (or
+    # lower) triangular part of the matrix.
     for i in range(len(lines)):
-        for j in range(len(lines)):
-            matrix[i][j] = Hamming_distance(lines[i], lines[j])
+        for j in range(i,len(lines)):
+            dist = Hamming_distance(lines[i], lines[j])
+            matrix[i][j] = dist
+            matrix[j][i] = dist
     return matrix
 
 def print_to_file(data, filename):
