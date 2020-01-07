@@ -61,6 +61,10 @@ def main():
                             base pairs (how much overlap there will be).''')
     parser.add_argument('-g', '--graph', action = 'store', required = False,
                         help='''supply name of graph to write to file''')
+    parser.add_argument('-p', '--parallel', action = 'store', required = False,
+                        type = int, default = 1, help='''number of parallel
+                        processes to use for the barcode stats section
+                        (default %(default)s)''')
 
     args = parser.parse_args()
     glob_start = time.time()
@@ -129,7 +133,7 @@ def main():
         print("Sliding window analysis complete.")
         #get barcode stats
         print("Processing barcode statistics...")
-        getBarCodeStats(s_data, name, OUT)
+        getBarCodeStats(s_data, name, OUT, args.parallel)
         print("Barcodes processed.")
         # plot results
         print("Plotting results...")

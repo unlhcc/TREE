@@ -8,6 +8,7 @@ from data_processing import *
 from barcode_stats import *
 from predict_rho import *
 from ripser import ripser 
+from joblib import Parallel, delayed
 
 #Restrictions:
 #NumSites should be even. For reasonable behavior, make offset=length/2
@@ -38,23 +39,26 @@ def process_data(inFile):
     print("Data Input Done")
     return data
 
-# get barcode stats per window, print to file
-def getBarCodeStats(s_data, name, OUT):
-    for i in range(len(s_data[0])):
+def getBarCodeStatsKernel(s_data, name, OUT, i):
     # Comput hamming distance and run ripser on each subpopulation
-        HammingFile = OUT +  '/Hamm_' + name + '_window_' + str(i) + '.txt'
-        StatsFile = OUT + '/BStats_' + name + '_window_' + str(i) + '.txt'
-        subPop = [s_data[j][i] for j in range(len(s_data))]
-        matrix = empty_matrix(subPop)
-        hamm_matrix = populate_matrix(matrix, subPop)
-        print_to_file(hamm_matrix, HammingFile)
-        bars = ripser(hamm_matrix,  distance_matrix=True, maxdim=1)
-        end_point = np.max(hamm_matrix)
-        dim0 = bars['dgms'][0]
-        dim1 = bars['dgms'][1]
+    HammingFile = OUT +  '/Hamm_' + name + '_window_' + str(i) + '.txt'
+    StatsFile = OUT + '/BStats_' + name + '_window_' + str(i) + '.txt'
+    subPop = [s_data[j][i] for j in range(len(s_data))]
+    matrix = empty_matrix(subPop)
+    hamm_matrix = populate_matrix(matrix, subPop)
+    print_to_file(hamm_matrix, HammingFile)
+    bars = ripser(hamm_matrix,  distance_matrix=True, maxdim=1)
+    end_point = np.max(hamm_matrix)
+    dim0 = bars['dgms'][0]
+    dim1 = bars['dgms'][1]
     # Get barcode stats
-        barStats(end_point, dim0, dim1, StatsFile)
-        print("Window {0} complete".format(i))
+    barStats(end_point, dim0, dim1, StatsFile)
+    print("Window {0} complete".format(i))
+
+# get barcode stats per window, print to file
+def getBarCodeStats(s_data, name, OUT, n_jobs):
+    # Run loop iterations in parallel since they are independent
+    Parallel(n_jobs=n_jobs,max_nbytes=1e4)(delayed(getBarCodeStatsKernel)(s_data, name, OUT, i) for i in range(len(s_data[0])))
 
 # plot avg0, avg1, b0, and b1 as window slides across genomes
 def plotSplitStats(files, name):
