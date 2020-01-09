@@ -139,7 +139,8 @@ def main():
         print("Plotting results...")
         Stats_files = glob.glob(OUT + '/BStats_' + name + '_window_*.txt')
         #plotSplitStats(Stats_files, name)
-        plot_TREE(Stats_files, graph)
+        if graph:
+            plot_TREE(Stats_files, graph)
         print("TREE analysis complete.")
 
 
