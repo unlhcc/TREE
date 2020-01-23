@@ -140,7 +140,7 @@ def main():
         Stats_files = glob.glob(OUT + '/BStats_' + name + '_window_*.txt')
         #plotSplitStats(Stats_files, name)
         if graph:
-            plot_TREE(Stats_files, graph)
+            plot_TREE(Stats_files, name, graph)
         print("TREE analysis complete.")
 
 

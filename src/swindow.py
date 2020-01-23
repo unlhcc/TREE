@@ -99,7 +99,7 @@ def read_stats(file):
 	b1 = float(stats[2])
 	return avg0, var0, b1
 
-def plot_TREE(files, name):
+def plot_TREE(files, name, graph):
     avg0 = []
     window = []
     rho_pred = []
@@ -129,7 +129,7 @@ def plot_TREE(files, name):
     ax1.set_xlabel("Window")
     ax1.set_ylabel(r"$\rho$")
     ax1.plot(window, rho_pred, 'b.')
-    plt.savefig(name)
+    plt.savefig(graph)
     
     # compute mean b1
 def mean_b1(files):
